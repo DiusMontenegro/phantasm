@@ -15,7 +15,7 @@
 
 Implemented:
 
-- Next.js foundation, landing page, Clerk authentication, protected Discover and Watch routes, paginated video feeds, playback, persistent dashboard playback, theme switching, dedicated AI chat, conversational video search, and device-local video preference ranking.
+- Next.js foundation, dark-only landing page, Clerk authentication, protected Discover and Watch routes, paginated video feeds, playback, persistent dashboard playback, dashboard theme switching, dedicated AI chat, conversational video search, and device-local video preference ranking.
 
 Not implemented yet:
 
@@ -143,7 +143,7 @@ None
 - Sign In
 - Logout
 - Switch AI models
-- Toggle theme
+- Toggle dashboard theme
 
 ---
 
@@ -238,7 +238,7 @@ Recommendations reflect activity stored on that device while candidate videos st
 | FR-07 | OpenRouter integration        | M        | Messages are processed by OpenRouter                                                  |
 | FR-08 | Model selector                | M        | User can select a model and use it for future prompts                                 |
 | FR-09 | AI search chatbot             | M        | User can search conversationally and continue with follow-up questions                 |
-| FR-10 | Dark and light themes         | S        | Theme switching works                                                                 |
+| FR-10 | Dashboard dark and light themes | S      | Dashboard theme switching works; the public landing page remains dark-only |
 | FR-11 | Responsive design             | S        | Layout works on mobile and desktop                                                    |
 | FR-12 | Discover and Watch routes     | M        | Discover recommendations and the dedicated Watch feed are available on separate routes |
 | FR-13 | Persistent video playback     | S        | Active playback follows dashboard navigation and can be closed in compact mode |
@@ -341,8 +341,10 @@ Uses the same dedicated PHANTASM AI workspace. It interprets natural-language re
 
 ## Theme
 
-- Light
-- Dark
+- Public landing page: dark-only
+- Dashboard light
+- Dashboard dark
+- Dashboard system preference when no saved choice exists
 - System
 
 ## References

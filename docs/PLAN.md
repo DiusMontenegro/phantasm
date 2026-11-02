@@ -25,6 +25,7 @@ Implementation order is sequential. Complete and validate one step before starti
 ### Confirmed implementation decisions
 
 - The dashboard is dark-first; the theme toggle persists the user's light/dark preference.
+- The public landing page is permanently dark-only and is independent of dashboard theme state.
 - Theme state initializes deterministically to avoid server/client hydration mismatches.
 - Video discovery uses server-side RapidAPI integration and privacy-enhanced YouTube embeds.
 - AI Chat is a dedicated question-and-answer workspace at `/dashboard/chat` and must never perform video discovery.
@@ -73,6 +74,7 @@ Implementation order is sequential. Complete and validate one step before starti
 - Create the public landing page at `/`.
 - Implement Sign In and Sign Up calls to action.
 - Apply the approved Apple-inspired, premium, responsive visual system.
+- Keep the public landing page permanently dark-only and do not add a landing-page theme toggle.
 - Add public-page metadata, loading state, and error handling.
 - Verify desktop and mobile layouts.
 
@@ -125,7 +127,7 @@ Implementation order is sequential. Complete and validate one step before starti
 
 ### 10. Complete themes, responsiveness, and accessibility
 
-- Implement light, dark, and system themes.
+- Implement light, dark, and system themes for authenticated dashboard surfaces only.
 - Ensure theme state is accessible and persists appropriately.
 - Validate layouts at 320px, 768px, 1024px, and 1440px.
 - Add keyboard navigation, visible focus states, accessible labels, and semantic markup.
