@@ -1,29 +1,34 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 
-export default async function VideoPlayerPage({
+async function VideoPlayer({
   params,
 }: {
   params: Promise<{ videoId: string }>;
 }) {
   const { videoId } = await params;
-  const embedUrl = `https://www.youtube-nocookie.com/embed/${encodeURIComponent(videoId)}`;
+  void videoId;
 
   return (
     <main className="video-player-page">
-      <Link className="video-back-link" href="/dashboard#watch">
+      <Link className="video-back-link" href="/dashboard/watch">
         <ArrowLeft size={17} />
         Back to feed
       </Link>
-      <div className="video-player-frame">
-        <iframe
-          src={embedUrl}
-          title="YouTube video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          referrerPolicy="strict-origin-when-cross-origin"
-          allowFullScreen
-        />
-      </div>
+      <div className="video-player-frame video-player-placeholder" aria-hidden="true" />
     </main>
+  );
+}
+
+export default function VideoPlayerPage({
+  params,
+}: {
+  params: Promise<{ videoId: string }>;
+}) {
+  return (
+    <Suspense fallback={<div className="video-player-loading" role="status">Loading video...</div>}>
+      <VideoPlayer params={params} />
+    </Suspense>
   );
 }

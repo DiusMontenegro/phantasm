@@ -11,8 +11,14 @@ export interface VideoItem {
   publishedAt: string;
 }
 
+export interface VideoPage {
+  videos: VideoItem[];
+  nextPageToken: string | null;
+}
+
 const searchResponseSchema = z.object({
   items: z.array(z.unknown()).default([]),
+  nextPageToken: z.string().optional(),
 });
 
 function readString(value: unknown): string {
@@ -20,12 +26,23 @@ function readString(value: unknown): string {
 }
 
 export async function getVideos(query = "technology"): Promise<VideoItem[]> {
+  const page = await getVideoPage(query);
+  return page.videos;
+}
+
+export async function getVideoPage(
+  query = "technology",
+  pageToken?: string,
+): Promise<VideoPage> {
   const env = getServerEnv();
   const url = new URL(`https://${env.RAPIDAPI_HOST}/search`);
   url.searchParams.set("part", "snippet");
   url.searchParams.set("q", query);
   url.searchParams.set("type", "video");
   url.searchParams.set("maxResults", "12");
+  if (pageToken) {
+    url.searchParams.set("pageToken", pageToken);
+  }
 
   const response = await fetch(url, {
     headers: {
@@ -41,7 +58,7 @@ export async function getVideos(query = "technology"): Promise<VideoItem[]> {
 
   const parsed = searchResponseSchema.parse(await response.json());
 
-  return parsed.items.flatMap((item) => {
+  const videos = parsed.items.flatMap((item) => {
     if (!item || typeof item !== "object") {
       return [];
     }
@@ -89,4 +106,9 @@ export async function getVideos(query = "technology"): Promise<VideoItem[]> {
       },
     ];
   });
+
+  return {
+    videos,
+    nextPageToken: parsed.nextPageToken || null,
+  };
 }
