@@ -1,7 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ArrowRight, MessageSquareText, Sparkles } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { getVideoPage } from "@/server/videos/rapidapi";
 import { AiChatWidget } from "@/features/chat/AiChatWidget";
 import { VideoFeed } from "@/features/videos/video-feed";
@@ -72,16 +72,6 @@ async function DashboardContent({
           )}
       </section>
 
-      <section className="dashboard-tools" aria-label="AI tools">
-        <article id="chat">
-          <MessageSquareText size={20} />
-          <div>
-            <h2>AI Chat</h2>
-            <p>Analyze ideas with an adaptive model copilot.</p>
-          </div>
-          <ArrowRight className="dashboard-tool-arrow" size={18} />
-        </article>
-      </section>
       <AiChatWidget />
     </main>
   );
