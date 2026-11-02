@@ -2,12 +2,23 @@
 
 import { FormEvent, useState } from "react";
 import { ChevronDown, MessageCircle, RotateCcw, Send, Sparkles, X } from "lucide-react";
+import Image from "next/image";
+import Link from "next/link";
 import { OPENROUTER_MODELS } from "@/lib/openrouter-models";
 
 interface ChatMessage {
   id: string;
   role: "user" | "assistant";
   content: string;
+  videos?: SearchVideo[];
+  query?: string;
+}
+
+interface SearchVideo {
+  id: string;
+  title: string;
+  channelTitle: string;
+  thumbnailUrl: string;
 }
 
 type ChatModelId = (typeof OPENROUTER_MODELS)[number]["id"];
@@ -60,6 +71,26 @@ export function AiChatWidget() {
       if (!response.ok) {
         const body = (await response.json()) as { error?: string };
         throw new Error(body.error || "The AI request failed.");
+      }
+      if (response.headers.get("content-type")?.includes("application/json")) {
+        const body = (await response.json()) as {
+          message?: string;
+          query?: string;
+          videos?: SearchVideo[];
+        };
+        setMessages((current) =>
+          current.map((message) =>
+            message.id === assistantMessage.id
+              ? {
+                  ...message,
+                  content: body.message || "Here are the videos I found.",
+                  query: body.query,
+                  videos: body.videos || [],
+                }
+              : message,
+          ),
+        );
+        return;
       }
       if (!response.body) throw new Error("The AI returned an empty response.");
 
@@ -117,8 +148,8 @@ export function AiChatWidget() {
             <div>
               <span className="ai-chat-status" aria-hidden="true" />
               <div>
-                <strong>AI Chat</strong>
-                <small>Questions and answers</small>
+                <strong>PHANTASM AI</strong>
+                <small>General chat and AI video search</small>
               </div>
             </div>
             <button type="button" onClick={() => setIsOpen(false)} aria-label="Close AI chat">
@@ -167,7 +198,7 @@ export function AiChatWidget() {
               <div className="ai-chat-empty">
                 <Sparkles size={22} />
                 <strong>Ask anything</strong>
-                <p>Get direct answers to general questions.</p>
+                <p>Ask a general question or search for videos.</p>
               </div>
             ) : (
               messages.map((message) => (
@@ -179,6 +210,35 @@ export function AiChatWidget() {
                     (message.role === "assistant" && isStreaming ? (
                       <span className="ai-chat-thinking">Thinking...</span>
                     ) : null)}
+                    {message.videos && message.videos.length > 0 && (
+                      <div className="ai-chat-search-results">
+                        <small className="ai-chat-search-query">
+                          Results for &ldquo;{message.query}&rdquo;
+                        </small>
+                        {message.videos.map((video) => (
+                          <Link
+                            className="ai-chat-search-result"
+                            href={`/dashboard/watch/${encodeURIComponent(video.id)}`}
+                            key={video.id}
+                          >
+                            <span className="ai-chat-search-thumbnail">
+                              {video.thumbnailUrl ? (
+                                <Image
+                                  src={video.thumbnailUrl}
+                                  alt=""
+                                  fill
+                                  sizes="96px"
+                                />
+                              ) : null}
+                            </span>
+                            <span>
+                              <strong>{video.title || "Untitled video"}</strong>
+                              <small>{video.channelTitle || "Unknown channel"}</small>
+                            </span>
+                          </Link>
+                        ))}
+                      </div>
+                    )}
                 </div>
               ))
             )}

@@ -13,9 +13,9 @@ Implementation order is sequential. Complete and validate one step before starti
 - [x] Step 5: Dashboard shell
 - [x] Step 6: Video feed and playback
 - [x] Step 7: Server-side OpenRouter chat service
-- [x] Step 8: Question-only AI chat widget and model selector
-- [ ] Step 9: Conversational AI search chatbot
-- [ ] Step 10: Themes, responsiveness, and accessibility completion
+- [x] Step 8: General-purpose AI chat widget and model selector
+- [x] Step 9: Unified AI chat and conversational video search
+- [x] Step 10: Themes, responsiveness, and accessibility completion
 - [ ] Step 11: SEO and public metadata
 - [ ] Step 12: Automated validation
 - [ ] Step 13: Release validation

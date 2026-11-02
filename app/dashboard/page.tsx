@@ -1,10 +1,12 @@
 import { auth } from "@clerk/nextjs/server";
-import { ArrowRight, MessageSquareText, Search, Sparkles } from "lucide-react";
-import { getVideos } from "@/server/videos/rapidapi";
-import { VideoCard } from "@/features/videos/video-card";
+import Link from "next/link";
+import { Suspense } from "react";
+import { ArrowRight, MessageSquareText, Sparkles } from "lucide-react";
+import { getVideoPage } from "@/server/videos/rapidapi";
 import { AiChatWidget } from "@/features/chat/AiChatWidget";
+import { VideoFeed } from "@/features/videos/video-feed";
 
-export default async function DashboardPage({
+async function DashboardContent({
   searchParams,
 }: {
   searchParams: Promise<{ q?: string | string[] }>;
@@ -13,11 +15,14 @@ export default async function DashboardPage({
   const params = await searchParams;
   const queryValue = Array.isArray(params.q) ? params.q[0] : params.q;
   const query = queryValue?.trim().slice(0, 100) || "technology";
-  let videos: Awaited<ReturnType<typeof getVideos>> = [];
+  let initialPage: Awaited<ReturnType<typeof getVideoPage>> = {
+    videos: [],
+    nextPageToken: null,
+  };
   let videoError = false;
 
   try {
-    videos = await getVideos(query);
+    initialPage = await getVideoPage(query);
   } catch {
     videoError = true;
   }
@@ -34,11 +39,11 @@ export default async function DashboardPage({
           </p>
         </div>
 
-        <button className="dashboard-ai-launcher" type="button">
+        <Link className="dashboard-ai-launcher" href="/dashboard/chat">
           <Sparkles size={16} />
           Ask PHANTASM
           <ArrowRight size={16} />
-        </button>
+        </Link>
       </section>
 
       <section className="dashboard-video-section" id="watch">
@@ -57,32 +62,16 @@ export default async function DashboardPage({
               <h3>Videos are temporarily unavailable</h3>
               <p>Check the video provider configuration and try again later.</p>
             </div>
-          ) : videos.length === 0 ? (
-            <div className="dashboard-empty-state">
-              <div className="dashboard-empty-orb" aria-hidden="true">
-                <Sparkles size={22} />
-              </div>
-              <h3>No videos found</h3>
-              <p>Try again when more recommendations are available.</p>
-            </div>
           ) : (
-            <div className="video-grid">
-              {videos.map((video) => (
-                <VideoCard video={video} key={video.id} />
-              ))}
-            </div>
+            <VideoFeed
+              query={query}
+              initialVideos={initialPage.videos}
+              initialNextPageToken={initialPage.nextPageToken}
+            />
           )}
       </section>
 
       <section className="dashboard-tools" aria-label="AI tools">
-        <article id="search">
-          <Search size={20} />
-          <div>
-            <h2>AI Search</h2>
-            <p>Find precise answers without breaking your flow.</p>
-          </div>
-          <ArrowRight className="dashboard-tool-arrow" size={18} />
-        </article>
         <article id="chat">
           <MessageSquareText size={20} />
           <div>
@@ -94,5 +83,29 @@ export default async function DashboardPage({
       </section>
       <AiChatWidget />
     </main>
+  );
+}
+
+export default function DashboardPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string | string[] }>;
+}) {
+  return (
+    <Suspense
+      fallback={
+        <main className="dashboard-content" aria-busy="true">
+          <div className="dashboard-loading-heading shimmer" />
+          <div className="dashboard-loading-copy shimmer" />
+          <div className="dashboard-loading-grid">
+            <div className="shimmer" />
+            <div className="shimmer" />
+            <div className="shimmer" />
+          </div>
+        </main>
+      }
+    >
+      <DashboardContent searchParams={searchParams} />
+    </Suspense>
   );
 }

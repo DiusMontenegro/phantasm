@@ -15,11 +15,10 @@
 
 Implemented:
 
-- Next.js foundation, landing page, Clerk authentication, protected dashboard, video search/feed/player, theme toggle, and question-only streamed AI chat.
+- Next.js foundation, landing page, Clerk authentication, protected dashboard, video search/feed/player, theme toggle, and one unified floating chatbot for general chat and conversational AI video search.
 
 Not implemented yet:
 
-- Conversational AI Search with follow-up messages and video results.
 - Final theme, responsive, accessibility, SEO, automated-test, release, and deployment work.
 
 Live provider journeys and Vercel deployment require browser and environment verification before launch.
@@ -222,7 +221,7 @@ Relevant video search results are returned in the conversational AI search inter
 | FR-03 | Route protection              | M        | Given unauthenticated user, when accessing dashboard, then redirect to authentication |
 | FR-04 | Video feed UI                 | M        | Dashboard displays video cards                                                        |
 | FR-05 | Video playback                | M        | Clicking a video starts playback                                                      |
-| FR-06 | AI chat widget                | M        | User can ask questions and receive text responses without video-search behavior       |
+| FR-06 | AI chat widget                | M        | One chatbot handles general questions and conversational video search                 |
 | FR-07 | OpenRouter integration        | M        | Messages are processed by OpenRouter                                                  |
 | FR-08 | Model selector                | M        | User can select a model and use it for future prompts                                 |
 | FR-09 | AI search chatbot             | M        | User can search conversationally and continue with follow-up questions                 |
@@ -293,11 +292,11 @@ Displays available videos.
 
 ### AI Chat
 
-Provides question-and-answer assistance only. It does not perform video search or show video results.
+Provides general question-and-answer assistance and conversational video discovery from the same floating chatbot.
 
 ### AI Search Chatbot
 
-Provides a separate conversational search experience. It interprets natural-language requests, returns relevant video results, and supports follow-up questions that refine the conversation.
+Is provided by the same floating chatbot as AI Chat. It interprets natural-language requests, returns relevant video results, and supports follow-up questions that refine the conversation.
 
 ---
 
@@ -509,4 +508,4 @@ The product can go live when:
 | ------------- | ---------------------- | ---------------------- |
 | November 2026 | Initial MVP definition | Project initialization |
 | November 2026 | Added implementation status | Document completed and remaining work |
-| November 2026 | Separated AI Chat and AI Search | Define AI Chat as question-only and AI Search as conversational video discovery |
+| November 2026 | Unified AI Chat and AI Search | One floating chatbot handles general questions and conversational video discovery |
