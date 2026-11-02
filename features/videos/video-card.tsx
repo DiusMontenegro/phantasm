@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Play } from "lucide-react";
 import type { VideoItem } from "@/server/videos/rapidapi";
+import { recordViewedVideo } from "@/lib/video-preferences";
 
 function formatPublishedDate(value: string) {
   const date = new Date(value);
@@ -22,6 +23,7 @@ export function VideoCard({ video }: { video: VideoItem }) {
       className="video-card"
       href={`/dashboard/watch/${encodeURIComponent(video.id)}`}
       aria-label={`Play ${video.title}`}
+      onClick={() => recordViewedVideo(video)}
     >
       <div className="video-thumbnail">
         {video.thumbnailUrl ? (

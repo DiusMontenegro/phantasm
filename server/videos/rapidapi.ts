@@ -16,6 +16,16 @@ export interface VideoPage {
   nextPageToken: string | null;
 }
 
+export class VideoProviderError extends Error {
+  status: number;
+
+  constructor(message: string, status: number) {
+    super(message);
+    this.name = "VideoProviderError";
+    this.status = status;
+  }
+}
+
 const searchResponseSchema = z.object({
   items: z.array(z.unknown()).default([]),
   nextPageToken: z.string().optional(),
@@ -53,7 +63,12 @@ export async function getVideoPage(
   });
 
   if (!response.ok) {
-    throw new Error(`Video provider request failed with ${response.status}`);
+    throw new VideoProviderError(
+      response.status === 429
+        ? "Daily video provider quota exhausted."
+        : `Video provider request failed with ${response.status}`,
+      response.status,
+    );
   }
 
   const parsed = searchResponseSchema.parse(await response.json());

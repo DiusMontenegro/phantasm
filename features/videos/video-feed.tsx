@@ -1,14 +1,20 @@
 "use client";
 
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { VideoCard } from "@/features/videos/video-card";
 import type { VideoItem, VideoPage } from "@/server/videos/rapidapi";
+import {
+  getRotatingDiscoveryQuery,
+  rankVideosLocally,
+  recordVideoSearch,
+} from "@/lib/video-preferences";
 
 interface VideoFeedProps {
   query: string;
   initialVideos: VideoItem[];
   initialNextPageToken: string | null;
+  personalized?: boolean;
 }
 
 async function fetchVideoPage(query: string, pageToken?: string): Promise<VideoPage> {
@@ -16,7 +22,10 @@ async function fetchVideoPage(query: string, pageToken?: string): Promise<VideoP
   if (pageToken) params.set("pageToken", pageToken);
 
   const response = await fetch(`/api/videos?${params.toString()}`);
-  if (!response.ok) throw new Error("Unable to load videos.");
+  if (!response.ok) {
+    const body = await response.json().catch(() => null) as { error?: string } | null;
+    throw new Error(body?.error ?? "Unable to load videos.");
+  }
   return response.json() as Promise<VideoPage>;
 }
 
@@ -24,8 +33,10 @@ export function VideoFeed({
   query,
   initialVideos,
   initialNextPageToken,
+  personalized = false,
 }: VideoFeedProps) {
   const loadMoreRef = useRef<HTMLDivElement>(null);
+  const [activeQuery, setActiveQuery] = useState(query);
   const {
     data,
     error,
@@ -33,8 +44,8 @@ export function VideoFeed({
     hasNextPage,
     isFetchingNextPage,
   } = useInfiniteQuery({
-    queryKey: ["videos", query],
-    queryFn: ({ pageParam }) => fetchVideoPage(query, pageParam),
+    queryKey: ["videos", activeQuery],
+    queryFn: ({ pageParam }) => fetchVideoPage(activeQuery, pageParam),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextPageToken ?? undefined,
     initialData: {
@@ -91,13 +102,45 @@ export function VideoFeed({
     };
   }, [fetchNextPage, hasNextPage, isFetchingNextPage, query]);
 
-  const videos = data?.pages.flatMap((page) => page.videos) ?? [];
+  const sourceVideos = useMemo(
+    () => data?.pages.flatMap((page) => page.videos) ?? [],
+    [data],
+  );
+  const [videos, setVideos] = useState(sourceVideos);
+
+  useEffect(() => {
+    recordVideoSearch(query);
+  }, [query]);
+
+  useEffect(() => {
+    if (!personalized) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      setActiveQuery(getRotatingDiscoveryQuery());
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [personalized]);
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setVideos(rankVideosLocally(sourceVideos));
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [sourceVideos]);
 
   if (error && videos.length === 0) {
+    const quotaExceeded = error.message.includes("quota");
+
     return (
       <div className="dashboard-empty-state" role="alert">
-        <h3>Videos are temporarily unavailable</h3>
-        <p>Check the video provider configuration and try again later.</p>
+        <h3>{quotaExceeded ? "Video provider quota reached" : "Videos are temporarily unavailable"}</h3>
+        <p>
+          {quotaExceeded
+            ? "The provider's daily request limit is exhausted. Try again after the quota resets."
+            : error.message}
+        </p>
       </div>
     );
   }

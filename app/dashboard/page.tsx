@@ -14,7 +14,7 @@ async function DashboardContent({
   await auth.protect();
   const params = await searchParams;
   const queryValue = Array.isArray(params.q) ? params.q[0] : params.q;
-  const query = queryValue?.trim().slice(0, 100) || "technology";
+  const query = queryValue?.trim().slice(0, 100) || "trending Philippines";
   let initialPage: Awaited<ReturnType<typeof getVideoPage>> = {
     videos: [],
     nextPageToken: null,
@@ -67,6 +67,7 @@ async function DashboardContent({
               query={query}
               initialVideos={initialPage.videos}
               initialNextPageToken={initialPage.nextPageToken}
+              personalized
             />
           )}
       </section>

@@ -1,5 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "PHANTASM YT AI | Watch. Search. Chat.",
@@ -31,7 +33,12 @@ const capabilities = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  const { userId } = await auth();
+  if (userId) {
+    redirect("/dashboard");
+  }
+
   return (
     <main className="landing-shell overflow-hidden">
       <div className="gradient-field" aria-hidden="true">

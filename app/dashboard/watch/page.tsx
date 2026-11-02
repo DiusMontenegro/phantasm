@@ -17,7 +17,7 @@ async function WatchContent({
   await auth.protect();
   const params = await searchParams;
   const queryValue = Array.isArray(params.q) ? params.q[0] : params.q;
-  const query = queryValue?.trim().slice(0, 100) || "trending music entertainment";
+  const query = queryValue?.trim().slice(0, 100) || "trending Philippines news music entertainment";
   let initialPage: Awaited<ReturnType<typeof getVideoPage>> = {
     videos: [],
     nextPageToken: null,
