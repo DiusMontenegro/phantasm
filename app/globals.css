@@ -835,6 +835,15 @@ a {
   line-height: 1.6;
 }
 
+.dashboard-light .dashboard-hero {
+  border-bottom-color: rgba(0, 0, 0, .09);
+}
+
+.dashboard-light .dashboard-eyebrow,
+.dashboard-light .dashboard-lede {
+  color: #6f7078;
+}
+
 .dashboard-ai-launcher {
   flex: 0 0 auto;
   gap: 10px;
@@ -1389,7 +1398,11 @@ a {
 .dashboard-light .dashboard-nav-item { color: #70717a; }
 .dashboard-light .dashboard-nav-item:hover,
 .dashboard-light .dashboard-nav-item-active,
-.dashboard-light .dashboard-ai-launcher { color: #17181c; background: rgba(0,0,0,.05); }
+.dashboard-light .dashboard-ai-launcher {
+  border-color: rgba(0, 0, 0, .09);
+  color: #17181c;
+  background: rgba(0, 0, 0, .05);
+}
 .dashboard-light .dashboard-empty-state,
 .dashboard-light .dashboard-tools article { background: rgba(255,255,255,.5); }
 .dashboard-light .dashboard-icon-button { color: #34353b; background: rgba(0,0,0,.03); }
