@@ -27,9 +27,18 @@ Implementation order is sequential. Complete and validate one step before starti
 - The dashboard is dark-first; the theme toggle persists the user's light/dark preference.
 - Theme state initializes deterministically to avoid server/client hydration mismatches.
 - Video discovery uses server-side RapidAPI integration and privacy-enhanced YouTube embeds.
-- AI Chat is a floating question-and-answer widget and must never perform video discovery.
+- AI Chat is a dedicated question-and-answer workspace at `/dashboard/chat` and must never perform video discovery.
 - AI Search is a separate conversational experience with follow-up support and will return video results.
 - OpenRouter API calls and API keys remain server-side.
+- `/dashboard` is Discover and `/dashboard/watch` is the dedicated Watch feed.
+- Video pagination uses authenticated `/api/videos` requests with TanStack React Query.
+- Persistent playback is dashboard-level; full-page reloads intentionally clear remembered playback.
+- Mini-player dismissal is session-local and exposes a close control outside the active player route.
+- Discover rotates Philippines-focused queries and applies device-local ranking after hydration.
+- Watch remains trending-oriented and is not locally re-ranked.
+- Device preferences use `localStorage`; playback and discovery rotation use `sessionStorage`.
+- PHANTASM recommendations rank provider candidates using local activity, not the private YouTube homepage algorithm.
+- Provider failures are sanitized before reaching browser clients.
 
 ## Steps
 
@@ -107,7 +116,7 @@ Implementation order is sequential. Complete and validate one step before starti
 ### 9. Implement AI search
 
 - Create the search feature under `features/search`.
-- Build AI search as a dedicated conversational chatbot, separate from the question-only AI chat widget.
+- Build AI search as a dedicated conversational experience in the unified AI workspace, separate from general question answering.
 - Connect natural-language search requests to the server-side AI and video discovery services.
 - Support follow-up messages that refine or clarify an existing search conversation.
 - Display video results conversationally within the AI search interface.

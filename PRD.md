@@ -15,11 +15,11 @@
 
 Implemented:
 
-- Next.js foundation, landing page, Clerk authentication, protected dashboard, video search/feed/player, theme toggle, and one unified floating chatbot for general chat and conversational AI video search.
+- Next.js foundation, landing page, Clerk authentication, protected Discover and Watch routes, paginated video feeds, playback, persistent dashboard playback, theme switching, dedicated AI chat, conversational video search, and device-local video preference ranking.
 
 Not implemented yet:
 
-- Final theme, responsive, accessibility, SEO, automated-test, release, and deployment work.
+- Final public SEO metadata, automated Playwright coverage, release validation, and deployment verification.
 
 Live provider journeys and Vercel deployment require browser and environment verification before launch.
 
@@ -64,6 +64,8 @@ Personal learning, experimentation, and portfolio project focused on modern AI a
 5. Integrate AI chat powered by OpenRouter.
 6. Allow users to switch between AI models.
 7. Provide conversational AI search with follow-up support.
+8. Preserve active video playback while navigating authenticated dashboard routes.
+9. Provide device-local video ranking based on searches and viewing activity.
 
 ## Non-Goals
 
@@ -156,7 +158,7 @@ None
 
 ### Success Criteria
 
-Authenticated users can access protected pages.
+Authenticated users can access protected pages. Authenticated visits to the landing, sign-in, and sign-up routes redirect directly to the dashboard.
 
 ---
 
@@ -169,20 +171,20 @@ Authenticated users can access protected pages.
 
 ### Success Criteria
 
-Video playback starts without errors.
+Video playback starts without errors. Watch is separate from Discover; selecting a video opens its player route and a compact persistent player remains available during dashboard navigation.
 
 ---
 
 ## AI Chat Journey
 
-1. User opens the AI chat widget.
-2. User asks a general question.
+1. User opens the dedicated AI chat workspace.
+2. User opens the dedicated AI chat workspace and asks a general question.
 3. Prompt is sent to OpenRouter.
 4. AI returns a response.
 
 ### Success Criteria
 
-The answer appears in the chat interface. AI chat is for asking questions and does not perform video discovery or display search results.
+The answer appears progressively in the chat interface. AI chat is for asking questions and does not perform video discovery or display search results.
 
 ---
 
@@ -208,7 +210,18 @@ Selected model powers future responses.
 
 ### Success Criteria
 
-Relevant video search results are returned in the conversational AI search interface, including a clear state when no results are found.
+Relevant video search results are returned in the conversational AI interface, including a clear state when no results are found. Follow-up messages refine the existing search.
+
+## Personalized Discovery Journey
+
+1. User searches for videos or views videos in the application.
+2. Relevant activity is stored in browser local storage on that device.
+3. Discover candidates are ranked using channel, title-term, and viewed-video preferences.
+4. Watch remains trending-oriented and does not use the same local ranking.
+
+### Success Criteria
+
+Recommendations reflect activity stored on that device while candidate videos still come from the configured provider. Refreshing the page resets persistent playback rather than restoring stale playback state.
 
 ---
 
@@ -221,12 +234,16 @@ Relevant video search results are returned in the conversational AI search inter
 | FR-03 | Route protection              | M        | Given unauthenticated user, when accessing dashboard, then redirect to authentication |
 | FR-04 | Video feed UI                 | M        | Dashboard displays video cards                                                        |
 | FR-05 | Video playback                | M        | Clicking a video starts playback                                                      |
-| FR-06 | AI chat widget                | M        | One chatbot handles general questions and conversational video search                 |
+| FR-06 | AI chat workspace             | M        | Dedicated workspace handles general questions and conversational video search |
 | FR-07 | OpenRouter integration        | M        | Messages are processed by OpenRouter                                                  |
 | FR-08 | Model selector                | M        | User can select a model and use it for future prompts                                 |
 | FR-09 | AI search chatbot             | M        | User can search conversationally and continue with follow-up questions                 |
 | FR-10 | Dark and light themes         | S        | Theme switching works                                                                 |
 | FR-11 | Responsive design             | S        | Layout works on mobile and desktop                                                    |
+| FR-12 | Discover and Watch routes     | M        | Discover recommendations and the dedicated Watch feed are available on separate routes |
+| FR-13 | Persistent video playback     | S        | Active playback follows dashboard navigation and can be closed in compact mode |
+| FR-14 | Infinite video scrolling      | M        | Additional provider pages load near the feed boundary |
+| FR-15 | Device-local personalization  | S        | Discover rankings are influenced by local searches and video viewing activity |
 
 ---
 
@@ -239,8 +256,12 @@ Relevant video search results are returned in the conversational AI search inter
 | `/`          | Landing Page     | Yes    | No            |
 | `/sign-in`   | Sign In          | Yes    | No            |
 | `/sign-up`   | Sign Up          | Yes    | No            |
-| `/dashboard` | Main Application | No     | Yes           |
-| `/api/chat`  | Streaming question-only AI chat | No | Yes |
+| `/dashboard` | Discover | No | Yes |
+| `/dashboard/watch` | Watch feed | No | Yes |
+| `/dashboard/watch/[videoId]` | Video player | No | Yes |
+| `/dashboard/chat` | PHANTASM AI workspace | No | Yes |
+| `/api/chat` | AI chat and conversational search | No | Yes |
+| `/api/videos` | Paginated video provider endpoint | No | Yes |
 
 ## Navigation
 
@@ -253,6 +274,8 @@ Relevant video search results are returned in the conversational AI search inter
 ### Authenticated
 
 - Dashboard
+- Discover
+- Watch
 - AI Chat
 - Model Selector
 - Logout
@@ -263,8 +286,9 @@ Relevant video search results are returned in the conversational AI search inter
 2. Sidebar Navigation
 3. Video Feed
 4. Video Player
-5. AI Chat Widget
-6. Model Selector
+5. Persistent Mini Player
+6. AI Chat Workspace
+7. Model Selector
 
 ---
 
@@ -292,11 +316,11 @@ Displays available videos.
 
 ### AI Chat
 
-Provides general question-and-answer assistance and conversational video discovery from the same floating chatbot.
+Provides general question-and-answer assistance in the dedicated `/dashboard/chat` workspace.
 
 ### AI Search Chatbot
 
-Is provided by the same floating chatbot as AI Chat. It interprets natural-language requests, returns relevant video results, and supports follow-up questions that refine the conversation.
+Uses the same dedicated PHANTASM AI workspace. It interprets natural-language requests, returns relevant video results, and supports follow-up questions that refine the conversation.
 
 ---
 
@@ -345,6 +369,24 @@ Is provided by the same floating chatbot as AI Chat. It interprets natural-langu
 | File Storage   | No     | Not required             |
 | Analytics      | No     | Not required             |
 | Multi-Tenant   | No     | Not required             |
+| Video provider | Yes    | RapidAPI YouTube v31     |
+| Infinite data  | Yes    | TanStack React Query     |
+| Persistence    | Yes    | Browser local/session storage |
+
+## Application Architecture Decisions
+
+- `/dashboard` is Discover.
+- `/dashboard/watch` is the dedicated Watch feed.
+- `/dashboard/watch/[videoId]` is the primary video player route.
+- A dashboard-level mini player preserves playback while navigating between dashboard routes.
+- Full-page reloads intentionally clear remembered playback.
+- Server Components fetch initial provider data where practical.
+- `/api/videos` supplies authenticated, paginated feeds for infinite scrolling.
+- Device preferences are stored in `localStorage` under `phantasm-video-preferences`.
+- Discover rotates Philippines-focused queries in session storage and applies local ranking after hydration.
+- Watch remains trending-oriented and is not locally re-ranked.
+- Official YouTube APIs do not expose YouTube's private homepage algorithm. PHANTASM therefore ranks provider candidates using device-local activity.
+- Provider failures are surfaced with sanitized browser messages; provider credentials and raw response bodies are not exposed.
 
 ## OpenRouter Models
 
@@ -424,6 +466,10 @@ English only
 6. AI Chat
 7. Model Switching
 8. Theme Switching
+9. Discover and Watch navigation
+10. Persistent video playback
+11. Infinite scrolling
+12. Device-local recommendation updates
 
 ## Mandatory Tests
 
@@ -508,4 +554,7 @@ The product can go live when:
 | ------------- | ---------------------- | ---------------------- |
 | November 2026 | Initial MVP definition | Project initialization |
 | November 2026 | Added implementation status | Document completed and remaining work |
-| November 2026 | Unified AI Chat and AI Search | One floating chatbot handles general questions and conversational video discovery |
+| November 2026 | Unified AI Chat and AI Search | One dedicated workspace handles general questions and conversational video discovery |
+| November 2026 | Separated Discover, Watch, and AI routes | Added route-specific navigation and playback behavior |
+| November 2026 | Added persistent playback | Preserved active video navigation with session-local refresh reset |
+| November 2026 | Added device-local Discover ranking | Added Philippines rotation and local preference ranking |
