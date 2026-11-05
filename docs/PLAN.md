@@ -40,6 +40,9 @@ Implementation order is sequential. Complete and validate one step before starti
 - Device preferences use `localStorage`; playback and discovery rotation use `sessionStorage`.
 - PHANTASM recommendations rank provider candidates using local activity, not the private YouTube homepage algorithm.
 - Provider failures are sanitized before reaching browser clients.
+- Clerk sign-in and sign-up use branded dark auth surfaces and redirect authenticated users to `/dashboard`.
+- Authenticated dashboard navigation does not eagerly prefetch protected RSC payloads, preventing stale RSC fetch failures during auth or development-server transitions.
+- Mobile-first responsive work starts at 390px and validates 320px, 768px, 1280px, and wider layouts without fixed-width overflow.
 
 ## Steps
 
@@ -128,6 +131,8 @@ Implementation order is sequential. Complete and validate one step before starti
 ### 10. Complete themes, responsiveness, and accessibility
 
 - Implement light, dark, and system themes for authenticated dashboard surfaces only.
+- Build mobile layouts at 390px first, using `dvh` for viewport-height surfaces and maintaining 44px touch targets and readable body text.
+- Prevent fixed-width layouts and horizontal overflow at 320px.
 - Ensure theme state is accessible and persists appropriately.
 - Validate layouts at 320px, 768px, 1024px, and 1440px.
 - Add keyboard navigation, visible focus states, accessible labels, and semantic markup.

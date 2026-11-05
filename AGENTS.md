@@ -549,6 +549,17 @@ Avoid:
 
 # 16. Responsive And Accessibility
 
+### Mobile-first UI
+
+- Build every screen at 390px first. Add `md:` and `lg:` only where the layout must change.
+- Unprefixed Tailwind classes are the mobile styles. Never patch desktop-first code with `max-*:` utilities.
+- One column by default. One primary action per screen.
+- Touch targets must be at least 44px. Body text must be at least 16px.
+- Use `dvh`, not `vh`, for viewport-height layouts.
+- Do not use fixed widths, and prevent horizontal overflow at 320px.
+- Reuse existing components and install no new UI packages.
+- Check every redesign at 390px, 768px, and 1280px before completion.
+
 Support:
 
 ```text

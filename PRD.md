@@ -7,7 +7,7 @@
 | Status       | Draft           |
 | Owner        | Dius Montenegro |
 | Version      | 0.1             |
-| Last Updated | November 2026   |
+| Last Updated | November 5, 2026 |
 
 ---
 
@@ -16,6 +16,9 @@
 Implemented:
 
 - Next.js foundation, dark-only landing page, Clerk authentication, protected Discover and Watch routes, paginated video feeds, playback, persistent dashboard playback, dashboard theme switching, dedicated AI chat, conversational video search, and device-local video preference ranking.
+- Responsive, branded Clerk sign-in and sign-up surfaces with authenticated-user redirects to Discover.
+- Mobile-first responsive dashboard and authentication layouts using viewport-safe sizing.
+- Protected dashboard navigation uses explicit RSC fetch behavior to avoid stale prefetched payload failures during local development and authenticated transitions.
 
 Not implemented yet:
 
@@ -347,6 +350,14 @@ Uses the same dedicated PHANTASM AI workspace. It interprets natural-language re
 - Dashboard system preference when no saved choice exists
 - System
 
+## Responsive Behavior
+
+- Mobile layouts are designed at 390px first and checked at 320px, 768px, 1280px, and desktop widths.
+- Touch targets are at least 44px.
+- Body text remains readable at a minimum of 16px.
+- Viewport-height layouts use `dvh`.
+- Layouts avoid fixed widths and horizontal overflow at 320px.
+
 ## References
 
 - YouTube
@@ -389,6 +400,8 @@ Uses the same dedicated PHANTASM AI workspace. It interprets natural-language re
 - Watch remains trending-oriented and is not locally re-ranked.
 - Official YouTube APIs do not expose YouTube's private homepage algorithm. PHANTASM therefore ranks provider candidates using device-local activity.
 - Provider failures are surfaced with sanitized browser messages; provider credentials and raw response bodies are not exposed.
+- Clerk sign-in and sign-up use the application's branded dark auth treatment, and authenticated visits redirect to `/dashboard`.
+- Dashboard links do not eagerly prefetch protected RSC payloads; navigation fetches the destination route when selected to avoid stale payload failures.
 
 ## OpenRouter Models
 
@@ -560,3 +573,5 @@ The product can go live when:
 | November 2026 | Separated Discover, Watch, and AI routes | Added route-specific navigation and playback behavior |
 | November 2026 | Added persistent playback | Preserved active video navigation with session-local refresh reset |
 | November 2026 | Added device-local Discover ranking | Added Philippines rotation and local preference ranking |
+| November 5, 2026 | Updated authentication and responsive layouts | Added branded Clerk auth surfaces and mobile-first dashboard/auth behavior |
+| November 5, 2026 | Stabilized protected dashboard navigation | Disabled eager protected-route prefetch to prevent stale RSC payload fetch failures |
