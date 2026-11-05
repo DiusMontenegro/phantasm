@@ -9,11 +9,25 @@ export default async function SignInPage() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center px-6 py-12">
-      <SignIn
-        forceRedirectUrl="/dashboard"
-        fallbackRedirectUrl="/dashboard"
-      />
+    <main className="auth-page">
+      <div className="auth-brand" aria-label="PHANTASM">
+        <span className="auth-brand-mark" aria-hidden="true">P</span>
+        PHANTASM
+      </div>
+      <div className="auth-card">
+        <SignIn
+          forceRedirectUrl="/dashboard"
+          fallbackRedirectUrl="/dashboard"
+          appearance={{
+            variables: {
+              colorBackground: "#101116",
+              colorPrimary: "#9b86ff",
+              borderRadius: "12px",
+              fontFamily: 'Inter, "Segoe UI", sans-serif',
+            },
+          }}
+        />
+      </div>
     </main>
   );
 }

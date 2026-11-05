@@ -39,7 +39,7 @@ async function DashboardContent({
           </p>
         </div>
 
-        <Link className="dashboard-ai-launcher" href="/dashboard/chat">
+        <Link className="dashboard-ai-launcher" href="/dashboard/chat" prefetch={false}>
           <Sparkles size={16} />
           Ask PHANTASM
           <ArrowRight size={16} />

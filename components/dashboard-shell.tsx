@@ -40,7 +40,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
         onClick={() => setSidebarOpen(false)}
       />
       <aside className="dashboard-sidebar">
-        <Link className="dashboard-brand" href="/dashboard">
+        <Link className="dashboard-brand" href="/dashboard" prefetch={false}>
           <span className="dashboard-brand-mark">P</span>
           <span>PHANTASM</span>
         </Link>
@@ -59,6 +59,7 @@ export function DashboardShell({ children }: { children: ReactNode }) {
                 className={`dashboard-nav-item${isActive ? " dashboard-nav-item-active" : ""}`}
                 href={item.href}
                 key={item.label}
+                prefetch={false}
                 onClick={(event) => {
                   setSidebarOpen(false);
 
